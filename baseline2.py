@@ -1,3 +1,6 @@
+"""
+выводит графики с данными и предсказанными значениями
+"""
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
@@ -59,9 +62,14 @@ for i, (label, group) in enumerate(results.items(), 1):
     rmse, mae, indices, predictions = group
     data_group = df[(df[acnum_column_name] == label.split('_')[0]) & (df[pos_column_name] == int(label.split('_')[2]))]
 
+    # Отображение всех реальных значений
     plt.subplot(2, 2, i)
-    plt.plot(data_group[egtm_column_name].values, label=f'{label}')
-    plt.plot(indices, predictions, label=f'{label} Predicted', color='orange')
+    plt.plot(data_group[egtm_column_name].values, label=f'{label} Actual')
+
+    # Выделение последних 25% реальных значений для совпадения с предсказанными
+    val_start_idx = len(data_group) - len(predictions)
+    plt.plot(range(val_start_idx, len(data_group)), predictions, label=f'{label} Predicted', color='orange')
+
     plt.title(f'{label} RMSE={rmse:.3f} MAE={mae:.3f}')
     plt.legend()
     plt.grid(True)
