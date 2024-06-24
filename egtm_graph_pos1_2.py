@@ -1,3 +1,7 @@
+"""
+код выводит графики egtm по двигателям
+потом надо вставить их в иар
+"""
 import pandas as pd
 import matplotlib.pyplot as plt
 
