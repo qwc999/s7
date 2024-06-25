@@ -61,7 +61,7 @@ for acnum in fleet:
         print(f'{key} RMSE={rmse:.3f} MAE={mae:.3f}')
 
 # Save predictions to a CSV file
-predictions_df.to_csv('predicted_data/linear_regression.csv', index=False)
+predictions_df.to_csv('predicted_data/ridge.csv', index=False)
 
 # Reading data for plots
 df = pd.read_csv('data/y_train.csv')
