@@ -2,9 +2,22 @@
 Обычная линейная регрессия
 """
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.preprocessing import StandardScaler
+
+
+# Function to detect and remove outliers
+def remove_outliers(df, column):
+    q1 = df[column].quantile(0.25)
+    q3 = df[column].quantile(0.75)
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+
 
 # Function to train the model and predict values
 def train_model(X, y):
@@ -12,9 +25,14 @@ def train_model(X, y):
     X = X.fillna(0).drop(columns=[
         'reportts', 'acnum', 'pos', 'fltdes', 'dep', 'arr'
     ])
+
+    # Standardize the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
     train_i = int(len(X) * 75 / 100)
-    X_train, y_train = X[0:train_i], y[0:train_i]
-    X_val, y_test = X[train_i:], y[train_i:]
+    X_train, y_train = X_scaled[0:train_i], y[0:train_i]
+    X_val, y_test = X_scaled[train_i:], y[train_i:]
 
     model = LinearRegression()
     model.fit(X_train, y_train)
@@ -25,12 +43,16 @@ def train_model(X, y):
 
     return rmse, mae, model, X_val.index, predicted
 
+
 # Reading data
 X_train = pd.read_csv('./data/X_train.csv', parse_dates=['reportts'])
 y_train = pd.read_csv('./data/y_train.csv', parse_dates=['reportts'])
 X_test = pd.read_csv('./data/X_test.csv', parse_dates=['reportts'])
 
 dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
+
+# Remove outliers
+dataset = remove_outliers(dataset, 'egtm')
 
 # Training models for each of the four graphs
 fleet = ['VQ-BGU', 'VQ-BDU']
