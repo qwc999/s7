@@ -1,9 +1,9 @@
 """
-Обычная линейная регрессия
+Регуляризованная линейная модель (Ridge)
 """
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Function to train the model and predict values
@@ -16,7 +16,7 @@ def train_model(X, y):
     X_train, y_train = X[0:train_i], y[0:train_i]
     X_val, y_test = X[train_i:], y[train_i:]
 
-    model = LinearRegression()
+    model = Ridge(alpha=5)
     model.fit(X_train, y_train)
 
     predicted = model.predict(X_val)
