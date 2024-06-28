@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
+
 # Function to train the model and predict values
 def train_model(X, y):
     assert len(X) == len(y)
@@ -31,7 +32,6 @@ y_train = pd.read_csv('./data/y_train.csv', parse_dates=['reportts'])
 X_test = pd.read_csv('./data/X_test.csv', parse_dates=['reportts'])
 
 dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
-
 # Training models for each of the four graphs
 fleet = ['VQ-BGU', 'VQ-BDU']
 positions = [1, 2]
@@ -46,7 +46,6 @@ for acnum in fleet:
         X = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)].drop(columns=['egtm'])
         y = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]['egtm']
         rmse, mae, model, indices, predictions = train_model(X, y)
-
         # Append predictions to the DataFrame
         temp_df = pd.DataFrame({
             'reportts': X.loc[indices, 'reportts'],
