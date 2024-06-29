@@ -1,30 +1,39 @@
-"""
-Регуляризованная линейная модель (Ridge)
-"""
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
+from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.model_selection import train_test_split
+from scipy.ndimage import median_filter
 
 
 # Function to train the model and predict values
-def train_model(X, y):
+def train_model(X, y, degree=2, alpha=0.1):
     assert len(X) == len(y)
     X = X.fillna(0).drop(columns=[
         'reportts', 'acnum', 'pos', 'fltdes', 'dep', 'arr'
     ])
-    train_i = int(len(X) * 75 / 100)
-    X_train, y_train = X[0:train_i], y[0:train_i]
-    X_val, y_test = X[train_i:], y[train_i:]
 
-    model = Ridge(alpha=5)
+    indices = X.index
+    poly = PolynomialFeatures(degree=degree)
+    X_poly = poly.fit_transform(X)
+
+    # Split data
+    X_train, X_val, y_train, y_test, indices_train, indices_val = train_test_split(X_poly, y, indices, test_size=0.25,
+                                                                                   random_state=42)
+
+    model = Ridge(alpha=alpha)
     model.fit(X_train, y_train)
 
     predicted = model.predict(X_val)
-    rmse = mean_squared_error(y_test, predicted, squared=False)
-    mae = mean_absolute_error(y_test, predicted)
+    smoothed_predicted = median_filter(predicted, size=3)
 
-    return rmse, mae, model, X_val.index, predicted
+    rmse = mean_squared_error(y_test, smoothed_predicted, squared=False)
+    mae = mean_absolute_error(y_test, smoothed_predicted)
+
+    return rmse, mae, model, indices_val, smoothed_predicted
+
 
 # Reading data
 X_train = pd.read_csv('./data/X_train.csv', parse_dates=['reportts'])
@@ -45,22 +54,22 @@ for acnum in fleet:
         key = f'{acnum}_pos_{pos}'
         X = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)].drop(columns=['egtm'])
         y = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]['egtm']
-        rmse, mae, model, indices, predictions = train_model(X, y)
+        rmse, mae, model, indices_val, predictions = train_model(X, y)
         # Append predictions to the DataFrame
         temp_df = pd.DataFrame({
-            'reportts': X.loc[indices, 'reportts'],
+            'reportts': X.loc[indices_val, 'reportts'],
             'acnum': acnum,
             'pos': pos,
             'egtm': predictions
         })
         predictions_df = pd.concat([predictions_df, temp_df], ignore_index=True)
 
-        # print(predictions)
-        results[key] = (rmse, mae, indices, predictions)
+        print(predictions)
+        results[key] = (rmse, mae, indices_val, predictions)
         print(f'{key} RMSE={rmse:.3f} MAE={mae:.3f}')
 
 # Save predictions to a CSV file
-predictions_df.to_csv('predicted_data/ridge.csv', index=False)
+predictions_df.to_csv('predicted_data/ridge_regression.csv', index=False)
 
 # Reading data for plots
 df = pd.read_csv('data/y_train.csv')
@@ -72,7 +81,7 @@ pos_column_name = df.columns[2]
 plt.figure(figsize=(14, 10))
 
 for i, (label, group) in enumerate(results.items(), 1):
-    rmse, mae, indices, predictions = group
+    rmse, mae, indices_val, predictions = group
     data_group = df[(df[acnum_column_name] == label.split('_')[0]) & (df[pos_column_name] == int(label.split('_')[2]))]
 
     # Plot all actual values

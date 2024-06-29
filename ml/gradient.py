@@ -66,7 +66,6 @@ def create_gradient_plots():
 
         figures.append(fig)
         subplot_titles.append(f'{key} RMSE={rmse:.3f} MAE={mae:.3f}')
-        print(f'{key} RMSE={rmse:.3f} MAE={mae:.3f}')
     fig = make_subplots(rows=2, cols=2,
                         subplot_titles=subplot_titles)
 
@@ -82,7 +81,3 @@ def create_gradient_plots():
     fig.update_layout(title_text='EGTM Predictions')
 
     return fig
-
-
-fig = create_gradient_plots()
-fig.show()

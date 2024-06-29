@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project</title>
+    <link rel="stylesheet" href="a.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        header {
+            width: 95%;
+            height: 100px;
+            background-color: #3498db;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border-radius: 24px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+        .logo-left {
+            display: flex;
+            align-items: center;
+        }
+        .logo {
+            font-size: 2.2em;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px; /* Уменьшение padding */
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+        }
+        .method-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            margin-top: 20px; /* Уменьшение отступа сверху */
+            margin-bottom: 20px;
+        }
+        .method-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            border-radius: 16px;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            font-size: 18px;
+            text-align: center;
+            flex-grow: 1;
+            max-width: 200px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            user-select: none;
+            position: relative;
+            text-decoration: none;
+        }
+        .method-card:hover {
+            background-color: #2980b9;
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .method-card:focus {
+            outline: none;
+        }
+        .method-card::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            white-space: nowrap;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .method-card:hover::after {
+            opacity: 1;
+        }
+        .method-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            user-select: none;
+        }
+        .method-text {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            user-select: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 18px;
+            text-align: left;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            cursor: pointer;
+            background-color: #f4f4f9;
+        }
+        th:hover {
+            background-color: #ddd;
+        }
+        .highlight {
+            background-color: #d4edda !important;
+        }
+    </style>
+    <!-- Add FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo-left">
+            <div class="logo">ECM</div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="method-cards">
+            <a href="graphs/regression" class="method-card" data-tooltip="Линейная регрессия">
+                <div class="method-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="method-text">Линейная Регрессия</div>
+            </a>
+            <a href="#" class="method-card" data-tooltip="Регуляризованная линейная модель">
+                <div class="method-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="method-text">Регуляризованная Модель</div>
+            </a>
+            <a href="graphs/gradient" class="method-card" data-tooltip="Градиент">
+                <div class="method-icon"><i class="fas fa-vector-square"></i></div>
+                <div class="method-text">Градиентный Спуск</div>
+            </a>
+            <a href="graphs/extra_trees_regressor" class="method-card" data-tooltip="Метод случайного леса">
+                <div class="method-icon"><i class="fas fa-tree"></i></div>
+                <div class="method-text">Случайный Лес</div>
+            </a>
+        </div>
+        <table id="modelTable">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0)">Модель</th>
+                    <th onclick="sortTable(1)">VQ-BGU, pos1: RMSE</th>
+                    <th onclick="sortTable(2)">VQ-BGU, pos1: MAE</th>
+                    <th onclick="sortTable(3)">VQ-BGU, pos2: RMSE</th>
+                    <th onclick="sortTable(4)">VQ-BGU, pos2: MAE</th>
+                    <th onclick="sortTable(5)">VQ-BDU, pos1: RMSE</th>
+                    <th onclick="sortTable(6)">VQ-BDU, pos1: MAE</th>
+                    <th onclick="sortTable(7)">VQ-BDU, pos2: RMSE</th>
+                    <th onclick="sortTable(8)">VQ-BDU, pos2: MAE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Линейная регрессия</td>
+                    <td>7.066</td>
+                    <td>5.773</td>
+                    <td>3.535</td>
+                    <td>2.842</td>
+                    <td>4.615</td>
+                    <td>3.251</td>
+                    <td>4.210</td>
+                    <td>3.784</td>
+                </tr>
+                <tr>
+                    <td>Градиентный спуск</td>
+                    <td>0.805</td>
+                    <td>0.506</td>
+                    <td>0.376</td>
+                    <td>0.274</td>
+                    <td>0.287</td>
+                    <td>0.203</td>
+                    <td>0.318</td>
+                    <td>0.213</td>
+                </tr>
+                <tr>
+                    <td>Случайный лес</td>
+                    <td>1.697</td>
+                    <td>1.269</td>
+                    <td>2.877</td>
+                    <td>2.363</td>
+                    <td>0.315</td>
+                    <td>0.276</td>
+                    <td>1.755</td>
+                    <td>1.489</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("modelTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount ++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+            highlightMinValues();
+        }
+
+        function highlightMinValues() {
+            var table, rows, cols, i, j, min, minCell;
+            table = document.getElementById("modelTable");
+            rows = table.rows;
+            cols = rows[0].cells.length;
+
+            // Remove existing highlights
+            for (i = 1; i < rows.length; i++) {
+                for (j = 1; j < cols; j++) {
+                    rows[i].cells[j].classList.remove('highlight');
+                }
+            }
+
+            // Highlight minimum values in each column
+            for (j = 1; j < cols; j++) {
+                min = parseFloat(rows[1].cells[j].innerHTML);
+                minCell = rows[1].cells[j];
+                for (i = 2; i < rows.length; i++) {
+                    if (parseFloat(rows[i].cells[j].innerHTML) < min) {
+                        min = parseFloat(rows[i].cells[j].innerHTML);
+                        minCell = rows[i].cells[j];
+                    }
+                }
+                minCell.classList.add('highlight');
+            }
+        }
+
+        // Initial highlight of minimum values
+        window.onload = function() {
+            highlightMinValues();
+        }
+    </script>
+</body>
+</html>
+
