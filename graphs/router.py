@@ -5,7 +5,8 @@ from fastapi.responses import HTMLResponse
 from ml import (
     create_gradient_plots,
     create_regression_plots,
-    create_etr_plots
+    create_etr_plots,
+    create_ridge_plots
 )
 
 graphs_router = APIRouter(prefix="/graphs", tags=["graphs"])
@@ -13,6 +14,12 @@ graphs_router = APIRouter(prefix="/graphs", tags=["graphs"])
 @graphs_router.get("/regression", response_class=HTMLResponse)
 async def plot_regressions_graphs():
     fig = create_regression_plots()
+    html_data = to_html(fig, full_html=True)
+    return HTMLResponse(content=html_data)
+
+@graphs_router.get("/ridge", response_class=HTMLResponse)
+async def plot_regressions_graphs():
+    fig = create_ridge_plots()
     html_data = to_html(fig, full_html=True)
     return HTMLResponse(content=html_data)
 
