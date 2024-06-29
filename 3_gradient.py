@@ -7,6 +7,7 @@ from sklearn.model_selection import cross_val_predict, KFold
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import numpy as np
 
+
 def train_model_cv(X, y):
     assert len(X) == len(y)
     X = X.fillna(0).drop(columns=['reportts', 'acnum', 'pos', 'fltdes', 'dep', 'arr'])
