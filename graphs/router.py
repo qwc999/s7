@@ -18,7 +18,7 @@ async def plot_regressions_graphs():
     return HTMLResponse(content=html_data)
 
 @graphs_router.get("/ridge", response_class=HTMLResponse)
-async def plot_regressions_graphs():
+async def plot_ridge_graphs():
     fig = create_ridge_plots()
     html_data = to_html(fig, full_html=True)
     return HTMLResponse(content=html_data)

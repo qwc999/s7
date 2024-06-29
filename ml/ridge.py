@@ -1,129 +1,104 @@
-"""
-Регуляризованная линейная модель (Ridge)
-"""
 import itertools
 import pandas as pd
-import plotly.graph_objects as go  
-from plotly.subplots import make_subplots 
-from sklearn.linear_model import Ridge
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+from sklearn.linear_model import BayesianRidge
+from sklearn.model_selection import cross_val_predict, KFold
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 
-# Function to train the model and predict values
-def train_model(X, y):
+# Функция для обучения модели и предсказания значений с использованием кросс-валидации
+def train_model_cv(X, y):
+    # Проверка, что длины X и y совпадают
     assert len(X) == len(y)
-    X = X.fillna(0).drop(columns=[
-        'reportts', 'acnum', 'pos', 'fltdes', 'dep', 'arr'
-    ])
-    train_i = int(len(X) * 75 / 100)
-    X_train, y_train = X[:train_i], y[:train_i]
-    X_val, y_test = X[train_i:], y[train_i:]
+    # Заполнение пропусков нулями и удаление ненужных колонок
+    X = X.fillna(0).drop(columns=['reportts', 'acnum', 'pos', 'fltdes', 'dep', 'arr'])
 
-    model = Ridge(alpha=5)
-    model.fit(X_train, y_train)
+    # Создание и настройка модели байесовской регрессии
+    model = BayesianRidge()
 
-    predicted = model.predict(X_val)
-    rmse = mean_squared_error(y_test, predicted, squared=False)
-    mae = mean_absolute_error(y_test, predicted)
+    # Определение кросс-валидации с 5 фолдами
+    kf = KFold(n_splits=5, shuffle=True, random_state=42)
 
-    return rmse, mae, model, X_val.index, predicted
+    # Предсказание с использованием кросс-валидации
+    predicted = cross_val_predict(model, X, y, cv=kf)
 
+    # Расчет метрик RMSE и MAE
+    rmse = mean_squared_error(y, predicted, squared=False)
+    mae = mean_absolute_error(y, predicted)
+
+    # Возвращение метрик и предсказанных значений
+    return rmse, mae, predicted
 
 def create_ridge_plots():
-    # Reading data
+    # Пути к файлам
+    X_train_path = './data/X_train.csv'
+    y_train_path = './data/y_train.csv'
+    X_test_path = './data/X_test.csv'
 
-    X_train = pd.read_csv('./data/X_train.csv', parse_dates=['reportts'])
-    y_train = pd.read_csv('./data/y_train.csv', parse_dates=['reportts'])
-    X_test = pd.read_csv('./data/X_test.csv', parse_dates=['reportts'])
+    # Чтение данных из CSV файлов
+    X_train = pd.read_csv(X_train_path, parse_dates=['reportts'])
+    y_train = pd.read_csv(y_train_path, parse_dates=['reportts'])
+    X_test = pd.read_csv(X_test_path, parse_dates=['reportts'])
 
+    # Объединение обучающего набора признаков и целевых значений по общим колонкам и удаление строк с пропусками в 'egtm'
     dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
-    # Training models for each of the four graphs
+
+    # Обучение моделей для каждого из четырех графиков (по комбинациям самолета и позиции)
     fleet = ['VQ-BGU', 'VQ-BDU']
     positions = [1, 2]
-    results = {}
-
-    # DataFrame to store results
-    predictions_df = pd.DataFrame(columns=['reportts', 'acnum', 'pos', 'egtm'])
+    figures = []
 
     for acnum, pos in itertools.product(fleet, positions):
+        # Создание ключа для идентификации комбинации самолета и позиции
         key = f'{acnum}_pos_{pos}'
+        # Отбор данных для данной комбинации
         X = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)].drop(columns=['egtm'])
         y = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]['egtm']
-        rmse, mae, model, indices, predictions = train_model(X, y)
-        # Append predictions to the DataFrame
-        temp_df = pd.DataFrame({
-            'reportts': X.loc[indices, 'reportts'],
-            'acnum': acnum,
-            'pos': pos,
-            'egtm': predictions
-        })
-        predictions_df = pd.concat([predictions_df, temp_df], ignore_index=True)
+        # Обучение модели и получение результатов
+        rmse, mae, predictions = train_model_cv(X, y)
 
-        # print(predictions)
-        results[key] = (rmse, mae, indices, predictions)
-        print(f'{key} RMSE={rmse:.3f} MAE={mae:.3f}')
+        # Создание реальных значений для графика
+        data_group = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]
+        actual_values = data_group['egtm'].values
 
-    # Save predictions to a CSV file
-    predictions_df.to_csv('predicted_data/ridge.csv', index=False)
+        # Определение индекса для отображения последних 25% реальных значений
+        val_start_idx = int(0.75 * len(actual_values))
 
-    # Reading data for plots
-    df = pd.read_csv('data/y_train.csv')
-    egtm_column_name = df.columns[3]
-    acnum_column_name = 'acnum'
-    pos_column_name = df.columns[2]
+        # Создание фигуры Plotly для текущей комбинации
+        fig = go.Figure()
 
-    # Plotting graphs
-    graphs = []
+        # Добавление реальных значений на график
+        fig.add_trace(go.Scatter(x=list(range(len(actual_values))), y=actual_values,
+                                mode='lines', name=f'{key} Actual'))
 
-    for i, (label, group) in enumerate(results.items(), 1):
-        rmse, mae, indices, predictions = group
-        data_group = df[(df[acnum_column_name] == label.split('_')[0]) & (df[pos_column_name] == int(label.split('_')[2]))]
-        val_start_idx = len(data_group) - len(predictions)
-        # Plot all actual values
-        
-        graphs.append(
-            [
-                f'{label} RMSE={rmse:.3f} MAE={mae:.3f}',
-                go.Scatter(
-                    y=data_group[egtm_column_name].values, 
-                    name=f'{label} Actual'
-                ),
-                go.Scatter(
-                    x=list(range(val_start_idx, len(data_group))),
-                    y=predictions,
-                    name=f'{label} Predicted',
-                ),
-            ]
-        )
-        
-        
-    fig = make_subplots(rows=2, cols=2, subplot_titles=[i[0] for i in graphs])
+        # Добавление предсказанных значений на график (только последние 25%)
+        fig.add_trace(go.Scatter(x=list(range(val_start_idx, len(predictions))),
+                                y=predictions[val_start_idx:], mode='lines', name=f'{key} Predicted'))
 
-    for i in range(2):
-        fig.add_trace(
-            graphs[0][i + 1],
-            row=1, 
-            col=1
-        )
-        fig.add_trace(
-            graphs[1][i + 1],
-            row=1, 
-            col=2
-        )
-        fig.add_trace(
-            graphs[2][i + 1],
-            row=2, 
-            col=1
-        )
-        fig.add_trace(
-            graphs[3][i + 1],
-            row=2, 
-            col=2
-        )
+        # Настройка заголовка графика
+        fig.update_layout(title=f'{key} RMSE={rmse:.3f} MAE={mae:.3f}',
+                        xaxis_title='Index', yaxis_title='EGTM Value')
 
-    fig.update_layout(
-        hovermode="x",
-        margin=dict(l=0, r=0, t=40, b=0)
-    )
-    
+        # Добавление фигуры в список
+        figures.append((f'{key} RMSE={rmse:.3f} MAE={mae:.3f}', fig))
+
+    # Распределение графиков по сетке 2x2
+    fig = make_subplots(rows=2, cols=2,
+                        subplot_titles=[figures[0][0], figures[1][0], figures[2][0], figures[3][0]])
+
+    # Задание расположения графиков
+    fig.add_trace(figures[0][1].data[0], row=1, col=1)
+    fig.add_trace(figures[0][1].data[1], row=1, col=1)
+    fig.add_trace(figures[1][1].data[0], row=2, col=1)
+    fig.add_trace(figures[1][1].data[1], row=2, col=1)
+    fig.add_trace(figures[2][1].data[0], row=1, col=2)
+    fig.add_trace(figures[2][1].data[1], row=1, col=2)
+    fig.add_trace(figures[3][1].data[0], row=2, col=2)
+    fig.add_trace(figures[3][1].data[1], row=2, col=2)
+
+    # Обновление общего заголовка фигуры
+    fig.update_layout(title_text='EGTM Predictions')
+
     return fig
+
