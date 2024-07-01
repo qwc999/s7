@@ -4,146 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project</title>
-    <link rel="stylesheet" href="a.css">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            background-color: #f4f4f9;
-        }
-        header {
-            width: 95%;
-            height: 100px;
-            background-color: #3498db;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            border-radius: 24px;
-            margin-top: 24px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-        .logo-left {
-            display: flex;
-            align-items: center;
-        }
-        .logo {
-            font-size: 2.2em;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px; /* Уменьшение padding */
-            background-color: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 1200px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
-        }
-        .method-cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
-            margin-top: 20px; /* Уменьшение отступа сверху */
-            margin-bottom: 20px;
-        }
-        .method-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background-color: #3498db;
-            color: white;
-            cursor: pointer;
-            border-radius: 16px;
-            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-            font-size: 18px;
-            text-align: center;
-            flex-grow: 1;
-            max-width: 200px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            user-select: none;
-            position: relative;
-            text-decoration: none;
-        }
-        .method-card:hover {
-            background-color: #2980b9;
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
-        .method-card:focus {
-            outline: none;
-        }
-        .method-card::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: -35px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.75);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            white-space: nowrap;
-            font-size: 14px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .method-card:hover::after {
-            opacity: 1;
-        }
-        .method-icon {
-            font-size: 40px;
-            margin-bottom: 10px;
-            user-select: none;
-        }
-        .method-text {
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            user-select: none;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 18px;
-            text-align: left;
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-        }
-        th {
-            cursor: pointer;
-            background-color: #f4f4f9;
-        }
-        th:hover {
-            background-color: #ddd;
-        }
-        .highlight {
-            background-color: #d4edda !important;
-        }
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                height: 100vh;
+                background-color: #f4f4f9;
+            }
+            header {
+                width: 95%;
+                height: 100px;
+                background-color: #3498db;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                text-align: center;
+                border-radius: 24px;
+                margin-top: 24px;
+                margin-bottom: 24px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: white;
+            }
+            .logo-left {
+                display: flex;
+                align-items: center;
+            }
+            .logo {
+                font-size: 2.2em;
+                font-weight: bold;
+                margin-right: 8px;
+            }
+            .container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px; /* Уменьшение padding */
+                background-color: #ffffff;
+                border-radius: 16px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                width: 90%;
+                max-width: 1200px;
+                margin-bottom: 20px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+            }
+            .container:hover {
+                transform: scale(1.02);
+                box-shadow: 0 6px 30px rgba(0, 0, 0, 0.15);
+            }
+            .method-cards {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px; /* Уменьшение промежутков */
+                width: 100%;
+                margin-top: 20px; /* Уменьшение отступа сверху */
+                margin-bottom: 20px;
+            }
+            .method-card {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 10px; /* Уменьшение padding */
+                background-color: #3498db;
+                color: white;
+                cursor: pointer;
+                border-radius: 16px;
+                transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+                font-size: 16px; /* Уменьшение шрифта */
+                text-align: center;
+                width: 150px; /* Уменьшение ширины карточки */
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                user-select: none;
+                position: relative;
+                text-decoration: none;
+            }
+            .method-card:hover {
+                background-color: #2980b9;
+                transform: translateY(-5px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            }
+            .method-card:focus {
+                outline: none;
+            }
+            .method-card::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                bottom: -35px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: rgba(0, 0, 0, 0.75);
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                white-space: nowrap;
+                font-size: 14px;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s;
+            }
+            .method-card:hover::after {
+                opacity: 1;
+            }
+            .method-icon {
+                font-size: 30px; /* Уменьшение размера иконки */
+                margin-bottom: 5px; /* Уменьшение отступа */
+                user-select: none;
+            }
+            .method-text {
+                font-size: 14px; /* Уменьшение шрифта */
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                user-select: none;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+                font-size: 18px;
+                text-align: left;
+            }
+            th, td {
+                padding: 12px;
+                border: 1px solid #ddd;
+            }
+            th {
+                cursor: pointer;
+                background-color: #f4f4f9;
+            }
+            th:hover {
+                background-color: #ddd;
+            }
+            .highlight {
+                background-color: #d4edda !important;
+            }
     </style>
     <!-- Add FontAwesome for icons -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
@@ -160,11 +158,15 @@
                 <div class="method-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="method-text">Линейная Регрессия</div>
             </a>
-            <a href="#" class="method-card" data-tooltip="Регуляризованная линейная модель">
+            <a href="graphs/bayesian_ridge" class="method-card" data-tooltip="Байесовская Регрессия">
                 <div class="method-icon"><i class="fas fa-sliders-h"></i></div>
-                <div class="method-text">Регуляризованная Модель</div>
+                <div class="method-text">Байесовская Регрессия</div>
             </a>
-            <a href="graphs/gradient" class="method-card" data-tooltip="Градиент">
+            <a href="graphs/polynomial_bayes" class="method-card" data-tooltip="Полиномиальный метод Байеса">
+                <div class="method-icon"><i class="fas fa-sliders-h"></i></div>
+                <div class="method-text">Полиномиальный метод Байеса</div>
+            </a>
+            <a href="graphs/gradient" class="method-card" data-tooltip="Градиентный Спуск">
                 <div class="method-icon"><i class="fas fa-vector-square"></i></div>
                 <div class="method-text">Градиентный Спуск</div>
             </a>
@@ -200,15 +202,26 @@
                     <td>3.784</td>
                 </tr>
                 <tr>
+                    <td>Байесовская регрессия</td>
+                    <td>1.509</td>
+                    <td>1.186</td>
+                    <td>0.970</td>
+                    <td>0.776</td>
+                    <td>1.645</td>
+                    <td>1.202</td>
+                    <td>1.244</td>
+                    <td>0.924</td>
+                </tr>
+                <tr>
                     <td>Градиентный спуск</td>
-                    <td>0.805</td>
-                    <td>0.506</td>
-                    <td>0.376</td>
-                    <td>0.274</td>
-                    <td>0.287</td>
-                    <td>0.203</td>
-                    <td>0.318</td>
-                    <td>0.213</td>
+                    <td>0.371</td>
+                    <td>0.289</td>
+                    <td>0.316</td>
+                    <td>0.242</td>
+                    <td>0.289</td>
+                    <td>0.225</td>
+                    <td>0.300</td>
+                    <td>0.243</td>
                 </tr>
                 <tr>
                     <td>Случайный лес</td>
@@ -297,4 +310,3 @@
     </script>
 </body>
 </html>
-

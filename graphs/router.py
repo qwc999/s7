@@ -5,7 +5,8 @@ from fastapi.responses import HTMLResponse
 from ml import (
     create_gradient_plots,
     create_regression_plots,
-    create_etr_plots
+    create_etr_plots,
+    bayesian_load_or_train_and_plot
 )
 
 graphs_router = APIRouter(prefix="/graphs", tags=["graphs"])
@@ -25,5 +26,11 @@ async def plot_gradient_graphs():
 @graphs_router.get("/extra_trees_regressor", response_class=HTMLResponse)
 async def plot_etr_graphs():
     fig = create_etr_plots()
+    html_data = to_html(fig, full_html=True)
+    return HTMLResponse(content=html_data)
+
+@graphs_router.get("/bayesian_ridge", response_class=HTMLResponse)
+async def plot_bayesian_graphs():
+    fig = bayesian_load_or_train_and_plot()
     html_data = to_html(fig, full_html=True)
     return HTMLResponse(content=html_data)
