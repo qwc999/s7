@@ -1,28 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c3c98939-f939-46e5-bfa3-1c76dbc306da" name="Default Changelist" comment="">
+    <list default="true" id="b520450e-0f45-4d6c-a5ce-3445924d22a4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1_linear_regression.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/2_ridge.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/3_gradient.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/4_extra_trees_reg.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/baseline.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/newY_train.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/egtm_graph_pos1_2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/egtm_graphic.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/graphs/router.py" beforeDir="false" afterPath="$PROJECT_DIR$/graphs/router.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml/bayesian_optimization.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/bayesian_optimization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ml/bayesian_ridge.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/bayesian_ridge.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml/extra_trees_reg.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/extra_trees_reg.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml/gradient.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/gradient.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ml/regression.py" beforeDir="false" afterPath="$PROJECT_DIR$/ml/regression.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/polinomial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/predicted_data/linear_regression.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/predicted_data/polynomial_regression.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/predicted_data/polynomial_regression_smoothed.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/predicted_data/ridge.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/predicted_data/ridge_regression.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/predicted_data/ridge_regression_smoothed.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/predicted_data/gradient.csv" beforeDir="false" afterPath="$PROJECT_DIR$/predicted_data/gradient.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/predicted_data/regression.csv" beforeDir="false" afterPath="$PROJECT_DIR$/predicted_data/regression.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/static/index.html" afterDir="false" />
     </list>
@@ -31,10 +24,17 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectId" id="2icuOvncU7RmFJJjjukNRSHTDtQ" />
+  <component name="ProjectId" id="2iWsOmsyUVQTtseRYQfuRWWPkAJ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -44,9 +44,30 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
-  <component name="RunManager">
-    <configuration name="bayesian_ridge" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="s7" />
+  <component name="RunManager" selected="Python.bayesian_optimization">
+    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="s7-prod" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="bayesian_optimization" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="s7-prod" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -57,7 +78,70 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ml/bayesian_ridge.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ml/bayesian_optimization.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="gradient (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="s7-prod" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="E:/downloads/s7-prodV2/ml" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="E:/downloads/s7-prodV2/ml/gradient.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="gradient" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="s7-prod" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ml" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ml/gradient.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="regression" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="s7-prod" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ml" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ml/regression.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -68,18 +152,22 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.bayesian_ridge" />
+        <item itemvalue="Python.bayesian_optimization" />
+        <item itemvalue="Python.gradient (1)" />
+        <item itemvalue="Python.gradient" />
+        <item itemvalue="Python.regression" />
+        <item itemvalue="Python.app" />
       </list>
     </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c3c98939-f939-46e5-bfa3-1c76dbc306da" name="Default Changelist" comment="" />
-      <created>1719802157891</created>
+      <changelist id="b520450e-0f45-4d6c-a5ce-3445924d22a4" name="Default Changelist" comment="" />
+      <created>1719617638825</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1719802157891</updated>
+      <updated>1719617638825</updated>
     </task>
     <servers />
   </component>

@@ -2,7 +2,7 @@ import itertools
 import pandas as pd
 import numpy as np
 import plotly.graph_objs as go
-import plotly.subplots as sp
+from plotly.subplots import make_subplots
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
@@ -75,85 +75,110 @@ def train_model(X, y):
     predictions = best_et.predict(X_val)
     rmse = np.sqrt(mean_squared_error(y_val, predictions))
     mae = mean_absolute_error(y_val, predictions)
-
+    print(rmse, mae, len(predictions))
     return rmse, mae, best_et, y_val.index, predictions
 
 
 def save_predictions_to_csv():
+    # Чтение данных
     X_train = pd.read_csv('./data/X_train.csv', parse_dates=['reportts'])
     y_train = pd.read_csv('./data/y_train.csv', parse_dates=['reportts'])
+    X_test = pd.read_csv('./data/X_test.csv', parse_dates=['reportts'])
 
     dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
+
+    # Обучение моделей для каждого из четырех графиков
     fleet = ['VQ-BGU', 'VQ-BDU']
     positions = [1, 2]
-    predicted_data = []
+    results = []
 
     for acnum, pos in itertools.product(fleet, positions):
         X = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)].drop(columns=['egtm'])
         y = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]['egtm']
         rmse, mae, model, indices, predictions = train_model(X, y)
-        data_group = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]
-        predicted_data.append(pd.DataFrame({
-            'reportts': data_group['reportts'].iloc[indices].reset_index(drop=True),
+
+        # Добавление результатов в общий список
+        results.append(pd.DataFrame({
+            'reportts': dataset.loc[indices, 'reportts'],
             'acnum': acnum,
             'pos': pos,
             'egtm': predictions
         }))
-        print(f'{acnum} pos {pos} - RMSE: {rmse}, MAE: {mae}')
 
+    # Сохранение результатов в CSV файл
+    result_df = pd.concat(results)
     os.makedirs('predicted_data', exist_ok=True)
-    pd.concat(predicted_data).to_csv('predicted_data/extra_trees.csv', index=False,
-                                     columns=['reportts', 'acnum', 'pos', 'egtm'])
+    result_df.to_csv('predicted_data/extra_trees_reg.csv', index=False)
 
 
-def create_etr_plots():
-    csv_file_path = 'predicted_data/extra_trees.csv'
+def create_etr_plots() -> go.Figure:
+    csv_file_path = 'predicted_data/extra_trees_reg.csv'
 
+    # Проверка на существование CSV файла
     if not os.path.exists(csv_file_path):
         save_predictions_to_csv()
 
-    df = pd.read_csv('./data/y_train.csv', parse_dates=['reportts'])
-    predicted_df = pd.read_csv(csv_file_path, parse_dates=['reportts'])
+    # Чтение данных для графиков
+    df = pd.read_csv('data/y_train.csv')
+    predicted_df = pd.read_csv(csv_file_path)
+    egtm_column_name = df.columns[3]
+    acnum_column_name = 'acnum'
+    pos_column_name = df.columns[2]
 
     fleet = ['VQ-BGU', 'VQ-BDU']
     positions = [1, 2]
-    results = {}
+    graphs = []
 
-    for acnum, pos in itertools.product(fleet, positions):
-        key = f'{acnum}_pos_{pos}'
-        data_group = df[(df['acnum'] == acnum) & (df['pos'] == pos)]
-        actual_values = data_group['egtm'].values
+    for i, (acnum, pos) in enumerate(itertools.product(fleet, positions), 1):
+        data_group = df[(df[acnum_column_name] == acnum) & (df[pos_column_name] == pos)]
+
+        # Найти соответствующий подмножество в результатах
         predicted_data = predicted_df[(predicted_df['acnum'] == acnum) & (predicted_df['pos'] == pos)]
+        val_start_idx = len(data_group) - len(predicted_data)
 
-        results[key] = {
-            'actual': actual_values,
-            'predicted': predicted_data['egtm'].values,
-            'reportts': data_group['reportts']
-        }
+        # Убедиться, что размеры совпадают
+        graphs.append(
+            [
+                f'{acnum}_pos_{pos}',
+                go.Scatter(
+                    y=data_group[egtm_column_name].values,
+                    name=f'{acnum}_pos_{pos}'
+                ),
+                go.Scatter(
+                    x=list(range(val_start_idx, len(data_group))),
+                    y=predicted_data['egtm'],
+                    name=f'{acnum}_pos_{pos} Predicted',
+                ),
+            ]
+        )
 
-    fig = sp.make_subplots(
-        rows=2,
-        cols=2,
-        subplot_titles=[
-            f'{key} RMSE={results[key]["rmse"]:.3f} MAE={results[key]["mae"]:.3f}'
-            for key in results
-        ],
+    fig = make_subplots(rows=2, cols=2, subplot_titles=[i[0] for i in graphs])
+
+    for i in range(2):
+        fig.add_trace(
+            graphs[0][i + 1],
+            row=1,
+            col=1
+        )
+        fig.add_trace(
+            graphs[1][i + 1],
+            row=1,
+            col=2
+        )
+        fig.add_trace(
+            graphs[2][i + 1],
+            row=2,
+            col=1
+        )
+        fig.add_trace(
+            graphs[3][i + 1],
+            row=2,
+            col=2
+        )
+
+    fig.update_layout(
+        hovermode="x",
+        margin=dict(l=0, r=0, t=40, b=0)
     )
 
-    for i, (label, group) in enumerate(results.items(), 1):
-        acnum, _, pos = label.split('_')
-        row = (i - 1) // 2 + 1
-        col = (i - 1) % 2 + 1
-
-        fig.add_trace(go.Scatter(x=group['reportts'], y=group['actual'], mode='lines', name=f'{label} Actual',
-                                 line=dict(color='blue')), row=row, col=col)
-        fig.add_trace(go.Scatter(x=group['reportts'], y=group['predicted'], mode='lines', name=f'{label} Predicted',
-                                 line=dict(color='red', dash='dash')), row=row, col=col)
-
-    fig.update_layout(title_text='EGTM Predictions', height=800, width=1200)
     return fig
-
-
-# Вызываем функцию для создания и отображения графиков
-fig = create_etr_plots()
-fig.show()

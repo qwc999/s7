@@ -1,3 +1,5 @@
+import os
+import itertools
 import pandas as pd
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
@@ -6,15 +8,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from skopt import BayesSearchCV
 from skopt.space import Real
-import os
-
-
-def load_data(X_train_path='./data/X_train.csv', y_train_path='./data/y_train.csv', X_test_path='./data/X_test.csv'):
-    """Загрузка данных из CSV файлов."""
-    X_train = pd.read_csv(X_train_path, parse_dates=['reportts'])
-    y_train = pd.read_csv(y_train_path, parse_dates=['reportts'])
-    X_test = pd.read_csv(X_test_path, parse_dates=['reportts'])
-    return X_train, y_train, X_test
+import numpy as np
 
 
 def train_model_cv(X, y):
@@ -34,7 +28,7 @@ def train_model_cv(X, y):
         estimator=BayesianRidge(),
         search_spaces=search_spaces,
         n_iter=100,
-        cv=KFold(n_splits=5, shuffle=True, random_state=42),
+        cv=KFold(n_splits=4, shuffle=True, random_state=42),
         scoring='neg_mean_squared_error',
         random_state=42,
         n_jobs=-1,
@@ -48,95 +42,115 @@ def train_model_cv(X, y):
 
     predicted = opt_model.predict(X)
 
-    rmse = mean_squared_error(y, predicted, squared=False)
-    mae = mean_absolute_error(y, predicted)
-
-    return rmse, mae, predicted, best_params
-
-
-def load_predictions_from_csv(file_path):
-    """Загрузка предсказанных данных из CSV файла."""
-    return pd.read_csv(file_path)
+    n_last = int(0.25 * len(y))
+    y_last = y[-n_last:]
+    predicted_last = predicted[-n_last:]
+    rmse = mean_squared_error(y_last, predicted_last, squared=False)
+    mae = mean_absolute_error(y_last, predicted_last)
+    print(rmse, mae)
+    return rmse, mae, model, n_last, predicted_last
 
 
-def plot_predictions(predictions_df, dataset):
-    """Построение графиков из предсказанных данных."""
-    figures = []
+def save_predictions_to_csv():
+    # Чтение данных
+    X_train = pd.read_csv('./data/X_train.csv', parse_dates=['reportts'])
+    y_train = pd.read_csv('./data/y_train.csv', parse_dates=['reportts'])
+    X_test = pd.read_csv('./data/X_test.csv', parse_dates=['reportts'])
 
-    for index, row in predictions_df.iterrows():
-        key = f"{row['acnum']}_pos_{row['pos']}"
-        actual_values = dataset[(dataset['acnum'] == row['acnum']) & (dataset['pos'] == row['pos'])]['egtm'].values
-        predictions = eval(row['predictions'])
+    dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
 
-        val_start_idx = int(0.75 * len(actual_values))
+    # Обучение моделей для каждого из четырех графиков
+    fleet = ['VQ-BGU', 'VQ-BDU']
+    positions = [1, 2]
+    results = []
 
-        fig = go.Figure()
+    for acnum, pos in itertools.product(fleet, positions):
+        X = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)].drop(columns=['egtm'])
+        y = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]['egtm']
+        rmse, mae, model, indices, predictions = train_model_cv(X, y)
 
-        fig.add_trace(go.Scatter(x=list(range(len(actual_values))), y=actual_values,
-                                 mode='lines', name=f'{key} Actual'))
+        # Добавление результатов в общий список
+        results.append(pd.DataFrame({
+            'reportts': dataset.loc[indices, 'reportts'],
+            'acnum': acnum,
+            'pos': pos,
+            'egtm': predictions
+        }))
 
-        fig.add_trace(go.Scatter(x=list(range(val_start_idx, len(predictions))),
-                                 y=predictions[val_start_idx:], mode='lines', name=f'{key} Predicted'))
-
-        fig.update_layout(title=f'{key} RMSE={row["rmse"]:.3f} MAE={row["mae"]:.3f}',
-                          xaxis_title='Index', yaxis_title='EGTM Value')
-
-        figures.append(fig)
-
-    fig = make_subplots(rows=2, cols=2,
-                        subplot_titles=['VQ-BGU_pos_1', 'VQ-BGU_pos_2', 'VQ-BDU_pos_1', 'VQ-BDU_pos_2'])
-
-    fig.add_trace(figures[0].data[0], row=1, col=1)
-    fig.add_trace(figures[0].data[1], row=1, col=1)
-    fig.add_trace(figures[1].data[0], row=2, col=1)
-    fig.add_trace(figures[1].data[1], row=2, col=1)
-    fig.add_trace(figures[2].data[0], row=1, col=2)
-    fig.add_trace(figures[2].data[1], row=1, col=2)
-    fig.add_trace(figures[3].data[0], row=2, col=2)
-    fig.add_trace(figures[3].data[1], row=2, col=2)
-
-    fig.update_layout(title_text='EGTM Predictions')
-
-    fig.show()
+    # Сохранение результатов в CSV файл
+    result_df = pd.concat(results)
+    os.makedirs('predicted_data', exist_ok=True)
+    result_df.to_csv('predicted_data/bayesian_optimization.csv', index=False)
 
 
-def perform_bayesian_optimization(X_train, y_train, predictions_file_path='./predicted_data/bayesianoptimization.csv'):
-    """Выполнение байесовской оптимизации с сохранением и загрузкой результатов."""
-    if os.path.exists(predictions_file_path):
-        predictions_df = load_predictions_from_csv(predictions_file_path)
-        print("Загрузка предсказанных данных из файла.")
-        dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
-    else:
-        dataset = X_train.merge(y_train, on=['acnum', 'pos', 'reportts']).dropna(subset=['egtm'])
+def create_bayesian_optimization_plots() -> go.Figure:
+    csv_file_path = 'predicted_data/bayesian_optimization.csv'
 
-        fleet = ['VQ-BGU', 'VQ-BDU']
-        positions = [1, 2]
-        results = []
+    # Проверка на существование CSV файла
+    if not os.path.exists(csv_file_path):
+        save_predictions_to_csv()
 
-        for acnum in fleet:
-            for pos in positions:
-                key = f'{acnum}_pos_{pos}'
-                X = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)].drop(columns=['egtm'])
-                y = dataset[(dataset['acnum'] == acnum) & (dataset['pos'] == pos)]['egtm']
-                rmse, mae, predictions, best_params = train_model_cv(X, y)
+    # Чтение данных для графиков
+    df = pd.read_csv('data/y_train.csv')
+    predicted_df = pd.read_csv(csv_file_path)
+    egtm_column_name = df.columns[3]
+    acnum_column_name = 'acnum'
+    pos_column_name = df.columns[2]
 
-                results.append({
-                    'acnum': acnum,
-                    'pos': pos,
-                    'rmse': rmse,
-                    'mae': mae,
-                    'predictions': str(list(predictions)),
-                    'best_params': best_params
-                })
+    fleet = ['VQ-BGU', 'VQ-BDU']
+    positions = [1, 2]
+    graphs = []
 
-        predictions_df = pd.DataFrame(results)
-        predictions_df.to_csv(predictions_file_path, index=False)
-        print(f"Предсказанные данные сохранены в файл: {predictions_file_path}")
+    for i, (acnum, pos) in enumerate(itertools.product(fleet, positions), 1):
+        data_group = df[(df[acnum_column_name] == acnum) & (df[pos_column_name] == pos)]
 
-    plot_predictions(predictions_df, dataset)
+        # Найти соответствующий подмножество в результатах
+        predicted_data = predicted_df[(predicted_df['acnum'] == acnum) & (predicted_df['pos'] == pos)]
+        val_start_idx = len(data_group) - len(predicted_data)
 
+        # Убедиться, что размеры совпадают
+        graphs.append(
+            [
+                f'{acnum}_pos_{pos}',
+                go.Scatter(
+                    y=data_group[egtm_column_name].values,
+                    name=f'{acnum}_pos_{pos}'
+                ),
+                go.Scatter(
+                    x=list(range(val_start_idx, len(data_group))),
+                    y=predicted_data['egtm'],
+                    name=f'{acnum}_pos_{pos} Predicted',
+                ),
+            ]
+        )
 
-# Пример использования функции
-if __name__ == "__main__":
-    X_train, y_train, X_test = load_data()
-    perform_bayesian_optimization(X_train, y_train)
+    fig = make_subplots(rows=2, cols=2, subplot_titles=[i[0] for i in graphs])
+
+    for i in range(2):
+        fig.add_trace(
+            graphs[0][i + 1],
+            row=1,
+            col=1
+        )
+        fig.add_trace(
+            graphs[1][i + 1],
+            row=1,
+            col=2
+        )
+        fig.add_trace(
+            graphs[2][i + 1],
+            row=2,
+            col=1
+        )
+        fig.add_trace(
+            graphs[3][i + 1],
+            row=2,
+            col=2
+        )
+
+    fig.update_layout(
+        hovermode="x",
+        margin=dict(l=0, r=0, t=40, b=0)
+    )
+
+    return fig
